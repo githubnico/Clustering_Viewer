@@ -1,50 +1,91 @@
+import javafx.beans.property.SimpleStringProperty;
+
 /**
  * Created by Deviltech on 10.11.2015.
  */
 public class ClusterEntry {
 
-    private String sequenceId;
-    private String strain;
-    private String length;
-    private String sequenceSimilarity;
+    private SimpleStringProperty sequenceId;
+    private SimpleStringProperty strain;
+    private SimpleStringProperty length;
+    private SimpleStringProperty sequenceSimilarity;
 
-    public ClusterEntry(String sequenceId, String strain, String length, String sequenceSimilarity) {
-        this.sequenceId = sequenceId;
-        this.strain = strain;
-        this.length = length;
-        this.sequenceSimilarity = sequenceSimilarity;
-    }
 
-    public String getSequenceId() {
+    public SimpleStringProperty sequenceIdProperty() {
+        if (sequenceId == null) {
+            sequenceId = new SimpleStringProperty(this, "sequenceId");
+        }
         return sequenceId;
     }
 
-    public void setSequenceId(String sequenceId) {
-        this.sequenceId = sequenceId;
-    }
-
-
-    public String getStrain() {
+    public SimpleStringProperty strainProperty() {
+        if (strain == null) {
+            strain = new SimpleStringProperty(this, "strain");
+        }
         return strain;
     }
 
+    public SimpleStringProperty length() {
+        if (length == null) {
+            length = new SimpleStringProperty(this, "length");
+        }
+        return length;
+    }
+
+    public SimpleStringProperty sequenceSimilarity() {
+        if (sequenceSimilarity == null) {
+            sequenceSimilarity = new SimpleStringProperty(this, "sequenceSimilarity");
+        }
+        return sequenceSimilarity;
+    }
+
+
+    public ClusterEntry(String sequenceId, String strain, String length, String sequenceSimilarity) {
+        this.sequenceId = new SimpleStringProperty(sequenceId);
+        this.strain = new SimpleStringProperty(strain);
+        this.length = new SimpleStringProperty(length);
+        this.sequenceSimilarity = new SimpleStringProperty(sequenceSimilarity);
+    }
+
+
+
+    public String getSequenceId() {
+        return sequenceId.get();
+    }
+
+    public void setSequenceId(String sequenceId) {
+        this.sequenceId.set(sequenceId);
+    }
+
+    public String getStrain() {
+        return strain.get();
+    }
+
     public void setStrain(String strain) {
-        this.strain = strain;
+        this.strain.set(strain);
     }
 
     public String getLength() {
+        return length.get();
+    }
+
+    public SimpleStringProperty lengthProperty() {
         return length;
     }
 
     public void setLength(String length) {
-        this.length = length;
+        this.length.set(length);
     }
 
     public String getSequenceSimilarity() {
+        return sequenceSimilarity.get();
+    }
+
+    public SimpleStringProperty sequenceSimilarityProperty() {
         return sequenceSimilarity;
     }
 
     public void setSequenceSimilarity(String sequenceSimilarity) {
-        this.sequenceSimilarity = sequenceSimilarity;
+        this.sequenceSimilarity.set(sequenceSimilarity);
     }
 }

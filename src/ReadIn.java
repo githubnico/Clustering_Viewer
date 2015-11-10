@@ -9,7 +9,8 @@ public class ReadIn {
 
     // Read in a file
     public ArrayList<String> readInFile(File file) throws FileNotFoundException {
-        StringBuilder stringBuffer = new StringBuilder();
+
+        // read in file
         BufferedReader bufferedReader = null;
         ArrayList<String> result = new ArrayList<String>();
 
@@ -40,11 +41,15 @@ public class ReadIn {
     // Generate a HashMap with Sequence Headers
     public HashMap<String, String> fastaToHashMap(File file) throws FileNotFoundException {
         HashMap<String, String> myMap = new HashMap<String, String>();
+
+        //read in fasta file
         ArrayList<String> myArray = readInFile(file);
         for (int i = 0; i < myArray.size(); i++) {
             String current = myArray.get(i);
             if(current.startsWith(">")){
+                // Key: Sequence ID
                 String key = current.substring(1, current.indexOf('.'));
+                // Value: strain
                 String value = current.substring(current.lastIndexOf(';')+1, current.length());
                 myMap.put(key, value);
             }
@@ -53,36 +58,55 @@ public class ReadIn {
     }
 
 
-    // Reads in clsr file, finds fasta file and generates all clusters
-    public ArrayList<Cluster> ClusterFileToCluster(File clsrFile) throws FileNotFoundException {
+    // Reads in .clsr file, finds fasta file and generates all clusters
+    public ArrayList<Cluster> ClusterFileToCluster(File clsrFile, boolean useFasta) throws FileNotFoundException {
         ArrayList<Cluster> myClusters = new ArrayList<Cluster>();
-        File fastaFile = new Filter().finder(clsrFile).get(0);
-        HashMap<String, String> myHashMapFamilies = fastaToHashMap(fastaFile);
+
+        HashMap<String, String> myHashMapFamilies = new HashMap<>();
+
+        //ignore Fasta file Strain if no file available
+        if(useFasta){
+            File fastaFile = new Filter().finder(clsrFile).get(0);
+            myHashMapFamilies = fastaToHashMap(fastaFile);
+        }
 
         ArrayList<String> myClusterReads = readInFile(clsrFile);
         for (int i = 0; i < myClusterReads.size(); i++) {
+            // Current cluster string
             String currentClusterString = myClusterReads.get(i);
             if(currentClusterString.startsWith(">")){
+                // prepare empty Cluster for ClusterEntries
                 Cluster currentCluster = new Cluster();
                 for(int j = i+1; j <myClusterReads.size(); j++){
                     String currentString = myClusterReads.get(j);
                     // new ClusterEntry
                     if(!currentString.startsWith(">")){
+                        // initiate sequenceSimilarity
+                        String sequenceSimilarity = "";
                         String length = currentString.substring(currentString.indexOf("\t")+2, currentString.indexOf("nt, >"));
                         String sequenceId = currentString.substring(currentString.indexOf(">")+1, currentString.indexOf("."));
-                        String sequenceSimilarity = "";
-                        if(currentString.charAt(currentString.length()-1) == '*'){
-                            sequenceSimilarity = "100.00%";
-                        }else{
-                            sequenceSimilarity = currentString.substring(currentString.indexOf("at +/")+5, currentString.length());
+                        String strain = "";
+                        // fill strain entry with filler, if fasta file not available
+                        if(useFasta){
+                            strain = myHashMapFamilies.get(sequenceId);
+                        } else {
+                            strain = myLabels.NOT_AVAILABLE;
                         }
-                        String strain = myHashMapFamilies.get(sequenceId);
-                        ClusterEntry myClusterEntry =  new ClusterEntry(sequenceId, strain, length, sequenceSimilarity);
-                        currentCluster.addEntry(myClusterEntry);
+                        // check for representative
+                        if(currentString.charAt(currentString.length()-1) == '*'){
+                            // representative
+                            sequenceSimilarity = myLabels.FULL_SIMILARITY;
+                            ClusterEntry myClusterEntry =  new ClusterEntry(sequenceId, strain, length, sequenceSimilarity);
+                            currentCluster.setRepresentative(myClusterEntry);
+                        }else{
+                            // no representative
+                            sequenceSimilarity = currentString.substring(currentString.indexOf("at +/")+5, currentString.length());
+                            ClusterEntry myClusterEntry =  new ClusterEntry(sequenceId, strain, length, sequenceSimilarity);
+                            currentCluster.addEntry(myClusterEntry);
+                        }
                     } else{
                         // end of ClusterEntry
                         myClusters.add(currentCluster);
-
 
                         break;
                     }
@@ -90,8 +114,6 @@ public class ReadIn {
 
             }
         }
-
-        //TODO
 
         return myClusters;
     }

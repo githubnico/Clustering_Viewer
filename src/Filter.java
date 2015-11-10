@@ -12,10 +12,10 @@ public class Filter {
         String clusterName = clusterFile.getName();
         File dir = new File(dirName);
 
-        // Get all .fa or .fasta files of directory
+        // Get all  .fasta files of directory
         File[] myFiles = dir.listFiles(new FilenameFilter() {
             public boolean accept(File dir, String filename)
-            { return filename.endsWith(".fasta"); }
+            { return filename.endsWith(myLabels.FASTA_FILETYPE); }
         } );
 
         ArrayList<File> results = new ArrayList<File>();

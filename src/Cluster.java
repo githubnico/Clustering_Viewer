@@ -5,11 +5,13 @@ import java.util.ArrayList;
  */
 public class Cluster {
 
+    private ClusterEntry representative;
     private ArrayList<ClusterEntry> myEntries;
 
     // standard constructor
-    public Cluster(ArrayList<ClusterEntry> myEntries) {
+    public Cluster(ClusterEntry representative, ArrayList<ClusterEntry> myEntries) {
         this.myEntries = myEntries;
+        this.representative = representative;
     }
 
     //empty constructor
@@ -25,20 +27,18 @@ public class Cluster {
         this.myEntries = myEntries;
     }
 
+    public ClusterEntry getRepresentative() {
+        return representative;
+    }
+
+    public void setRepresentative(ClusterEntry representative) {
+        this.representative = representative;
+    }
+
     // Add a single Entry
     public void addEntry(ClusterEntry c){
         myEntries.add(c);
     }
 
-    public String toString(){
-        String result = "";
-        for(ClusterEntry c: myEntries){
-            result += "NEW CLUSTER: \n";
-            result += c.getSequenceId() + "\n";
-            result += c.getLength() + "\n";
-            result += c.getStrain() + "\n";
-            result += c.getSequenceSimilarity() + "\n";
-        }
-        return result;
-    }
+
 }
